@@ -1,0 +1,90 @@
+#spring.application.name=gateway-server
+#spring.config.import=optional:configserver:http://localhost:8888
+#
+#spring.cloud.gateway.routes[0].id=users-getAll
+#spring.cloud.gateway.routes[0].uri=lb://users-server
+#spring.cloud.gateway.routes[0].predicates[0]=Path=/users
+#spring.cloud.gateway.routes[0].predicates[1]=Method=GET
+#spring.cloud.gateway.routes[0].predicates[2]=Header=Authorization, Bearer (.*)
+#spring.cloud.gateway.routes[0].filters[0]=RemoveRequestHeader=Cookie
+#spring.cloud.gateway.routes[0].filters[1]=RewritePath=/users, /users
+#spring.cloud.gateway.routes[1].id=users-getOne
+#spring.cloud.gateway.routes[1].uri=lb://users-server
+#spring.cloud.gateway.routes[1].predicates[0]=Path=/getUser/1
+#spring.cloud.gateway.routes[1].predicates[1]=Method=GET
+#spring.cloud.gateway.routes[1].filters[0]=RemoveRequestHeader=Cookie
+#spring.cloud.gateway.routes[1].filters[1]=RewritePath=/getUser/1, /users/getUser/1
+token:
+  secret: 1234qwer5678tyui
+spring:
+  application:
+    name: gateway-server
+  config:
+    import: optional:configserver:http://localhost:8888
+  cloud:
+    gateway:
+      routes:
+#         status check
+        - id: users-status-check
+          uri: lb://users-server
+          predicates:
+            - Path=/users/status/check
+            - Method=GET
+            - Header=Authorization, Bearer (.*)
+          filters:
+            - RemoveRequestHeader=Cookie
+            - AuthorizationHeaderFilter
+#         getAll
+        - id: users-get-all
+          uri: lb://users-server
+          predicates:
+            - Path=/users
+            - Method=GET
+            - Header=Authorization, Bearer (.*)
+          filters:
+            - AuthorizationHeaderFilter
+            - RemoveRequestHeader=Cookie
+#         create
+        - id: users-get-all
+          uri: lb://users-server
+          predicates:
+            - Path=/users/createUser
+            - Method=POST
+          filters:
+            - RemoveRequestHeader=Cookie
+#         create
+        - id: login
+          uri: lb://users-server
+          predicates:
+            - Path=/login
+            - Method=POST
+          filters:
+            - RemoveRequestHeader=Cookie
+#         getById
+        - id: getUser
+          uri: lb://users-server
+          predicates:
+            - Path=/users/getUser/**
+            - Method=GET
+            - Header=Authorization, Bearer (.*)
+          filters:
+            - AuthorizationHeaderFilter
+            - RemoveRequestHeader=Cookie
+#        - id: users-create
+#          uri: lb://users-server
+#          predicates:
+#            - Path=/users/createUser
+#            - Method=POST
+#            - Header=Authorization, Bearer (.*)
+#          filters:
+#            - RemoveRequestHeader=Cookie
+#            - RewritePath=/users/createUser, /createUser
+#            - AuthorizationHeaderFilter
+#        - id: users-get-update-delete
+#          uri: lb://users-server
+#          predicates:
+#            - Path=/users/**
+#            - Method=GET,PATCH,PUT,DELETE
+#          filters:
+#            - RemoveRequestHeader=Cookie
+#            - AuthorizationHeaderFilter
